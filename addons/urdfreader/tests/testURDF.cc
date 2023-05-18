@@ -71,6 +71,7 @@ TEST_CASE(__FILE__"_CenterOfMass_WithPartial", ""){
                                              false, false);
   CHECK(model.q_size == 7);
   CHECK(model.qdot_size == 7);
+  CHECK(model.mBodies.size() == 8);
   VectorNd q_zero (VectorNd::Zero (model.q_size));
   VectorNd qdot_zero (VectorNd::Zero (model.qdot_size));
   RigidBodyDynamics::UpdateKinematics (model, q_zero, qdot_zero, qdot_zero);
@@ -91,4 +92,39 @@ TEST_CASE(__FILE__"_CenterOfMass_WithPartial", ""){
   CHECK_THAT(model_com[2], IsClose(-0.1992383036,TEST_PREC,TEST_PREC));
 
   CHECK_THAT(mass, IsClose(8.035202,TEST_PREC, TEST_PREC));
+
+  // Only retrieve the part of the gripper
+  Model gripper_model;
+  bool gripperModelLoaded = PartialURDFReadFromFile(modelFile.c_str(),
+                                                    &gripper_model,
+                                                    "arm_left_tool_link",
+                                                    {},
+                                                    false, true);
+  CHECK(gripperModelLoaded);
+  CHECK(gripper_model.mFixedBodies.size()  == 9);
+  CHECK(gripper_model.q_size == 2);
+  CHECK(gripper_model.qdot_size == 2);
+//  VectorNd q_gripper_zero (VectorNd::Zero (model.q_size));
+//  VectorNd qdot_gripper_zero (VectorNd::Zero (model.qdot_size));
+//  RigidBodyDynamics::UpdateKinematics (gripper_model, q_gripper_zero,
+//                                       qdot_gripper_zero ,qdot_gripper_zero);
+
+//  SpatialRigidBodyInertia rbi_gripper =
+//      gripper_model.X_base[1].apply(gripper_model.I[1]);
+//  Vector3d gripper_com = rbi_gripper.h / rbi_gripper.m;
+//  CHECK_THAT(gripper_com.transpose()[0], IsClose(-0.212397,TEST_PREC,TEST_PREC));
+//  CHECK_THAT(gripper_com.transpose()[1], IsClose(0.035631,TEST_PREC,TEST_PREC));
+//  CHECK_THAT(gripper_com.transpose()[2], IsClose(-0.183835,TEST_PREC,TEST_PREC));
+
+//  Vector3d gripper_model__com;
+//  double gripper_mass;
+//  RigidBodyDynamics::Utils::CalcCenterOfMass (gripper_model, q_gripper_zero,
+//                                              qdot_gripper_zero,NULL, mass,
+//                                              gripper_model__com);
+//  CHECK_THAT(gripper_model__com[0], IsClose(0.0076029714,TEST_PREC,TEST_PREC));
+//  CHECK_THAT(gripper_model__com[1], IsClose(0.5179612982,TEST_PREC,TEST_PREC));
+//  CHECK_THAT(gripper_model__com[2], IsClose(-0.1992383036,TEST_PREC,TEST_PREC));
+
+//  // It should be around 1 Kg
+//  CHECK_THAT(gripper_mass, IsClose(1.xxx,TEST_PREC, TEST_PREC));
 }
